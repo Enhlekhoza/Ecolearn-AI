@@ -3,7 +3,9 @@ import prisma from '../lib/prisma';
 import { callAI } from '../services/ai';
 
 export const getSessions = async (req: Request, res: Response) => {
-  const userId = req.user.id;
+  if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+
+  const userId = Number(req.user.id);
 
   try {
     const sessions = await prisma.chatSession.findMany({
@@ -15,21 +17,24 @@ export const getSessions = async (req: Request, res: Response) => {
 
     res.status(200).json(sessions);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Something went wrong' });
   }
 };
 
 export const sendMessage = async (req: Request, res: Response) => {
-  const { message, sessionId } = req.body;
-  const userId = req.user.id;
+  if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
 
-  const response = await callAI(message);
+  const userId = Number(req.user.id);
+  const { message, sessionId } = req.body;
 
   try {
+    const response = await callAI(message);
+
     let session;
     if (sessionId) {
       session = await prisma.chatSession.findUnique({
-        where: { id: sessionId },
+        where: { id: Number(sessionId) },
       });
     } else {
       session = await prisma.chatSession.create({
@@ -54,6 +59,7 @@ export const sendMessage = async (req: Request, res: Response) => {
 
     res.status(200).json(chat);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Something went wrong' });
   }
 };
@@ -63,7 +69,7 @@ export const getHistory = async (req: Request, res: Response) => {
 
   try {
     const history = await prisma.chatHistory.findMany({
-      where: { sessionId: parseInt(sessionId) },
+      where: { sessionId: Number(sessionId) },
       orderBy: {
         createdAt: 'asc',
       },
@@ -71,6 +77,7 @@ export const getHistory = async (req: Request, res: Response) => {
 
     res.status(200).json(history);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Something went wrong' });
   }
 };

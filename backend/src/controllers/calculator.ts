@@ -1,11 +1,11 @@
-
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 
 export const calculate = async (req: Request, res: Response) => {
-  const { transport, energy, diet } = req.body;
-  const userId = req.user.id;
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
 
+  const userId = Number(req.user.id); // Convert to number
+  const { transport, energy, diet } = req.body;
   const total = transport + energy + diet;
 
   try {
@@ -17,12 +17,15 @@ export const calculate = async (req: Request, res: Response) => {
 
     res.status(200).json(carbonFootprint);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Something went wrong' });
   }
 };
 
 export const getFootprint = async (req: Request, res: Response) => {
-  const userId = req.user.id;
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
+  const userId = Number(req.user.id);
 
   try {
     const carbonFootprint = await prisma.carbonFootprint.findUnique({
@@ -35,6 +38,7 @@ export const getFootprint = async (req: Request, res: Response) => {
 
     res.status(200).json(carbonFootprint);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Something went wrong' });
   }
 };
