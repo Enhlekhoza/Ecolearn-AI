@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int              @id @default(autoincrement())
+  email           String           @unique
+  name            String?
+  password        String
+  carbonFootprint CarbonFootprint?
+  chatSessions    ChatSession[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model CarbonFootprint {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique
+  transport Float
+  energy    Float
+  diet      Float
+  total     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ChatSession {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  title     String
+  history   ChatHistory[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ChatHistory {
+  id        Int      @id @default(autoincrement())
+  session   ChatSession @relation(fields: [sessionId], references: [id])
+  sessionId Int
+  message   String
+  response  String
+  createdAt DateTime @default(now())
+}
+
+model EcoTip {
+  id        Int      @id @default(autoincrement())
+  tip       String
+  category  String
+  createdAt DateTime @default(now())
+}
