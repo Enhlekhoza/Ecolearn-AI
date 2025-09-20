@@ -9,7 +9,8 @@ import QuizPage from "./pages/QuizPage";
 import LearningPage from "./pages/LearningPage";
 import LessonDetailView from "./pages/LessonDetailView";
 import QuizTakingPage from "./pages/QuizTakingPage";
-import TopicDetailView from "./pages/TopicDetailView"; // Import TopicDetailView
+import TopicDetailView from "./pages/TopicDetailView";
+import ChatBot from "./components/ChatBot"; // Import ChatBot
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,7 +28,8 @@ const App = () => (
           <Route path="/quiz/:quizId" element={<QuizTakingPage />} />
           <Route path="/learn" element={<LearningPage />} />
           <Route path="/learn/:lessonId" element={<LessonDetailView />} />
-          <Route path="/learn/topics/:topicId" element={<TopicDetailView />} /> {/* Add Topic Detail Route */}
+          <Route path="/learn/topics/:topicId" element={<TopicDetailView />} />
+          <Route path="/chat" element={<ChatBot />} /> {/* Add ChatBot Route */}
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

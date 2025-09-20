@@ -36,10 +36,12 @@ const Header = () => {
                 Learn
               </Button>
             </Link>
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              <Sparkles className="w-4 h-4 mr-2" />
-              AI Chat
-            </Button>
+            <Link to="/chat"> {/* Wrap AI Chat button with Link */}
+              <Button variant="ghost" className="text-foreground hover:text-primary">
+                <Sparkles className="w-4 h-4 mr-2" />
+                AI Chat
+              </Button>
+            </Link>
             <Link to="/login">
               <Button variant="nature" size="sm">
                 Login

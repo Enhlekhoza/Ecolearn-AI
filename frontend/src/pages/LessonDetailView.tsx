@@ -115,7 +115,9 @@ const LessonDetailView: React.FC = () => {
             </CardHeader>
             <CardContent>
               <p className="text-lg text-green-700">{lesson.quiz}</p>
-              <Button className="mt-4 bg-green-600 hover:bg-green-700">Take Quiz</Button>
+              <Link to={`/quiz/${lesson.id}`}> {/* Wrap Button with Link */}
+                <Button className="mt-4 bg-green-600 hover:bg-green-700">Take Quiz</Button>
+              </Link>
             </CardContent>
           </Card>
         )}
