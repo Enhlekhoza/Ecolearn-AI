@@ -34,8 +34,12 @@ export const getQuizzes = async (req: Request, res: Response) => {
 export const getQuiz = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    console.log('Received quiz ID from params:', id);
+    const parsedId = parseInt(id);
+    console.log('Parsed quiz ID:', parsedId);
+
     const quiz = await prisma.quiz.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: parsedId },
       include: {
         questions: {
           include: {
@@ -43,21 +47,29 @@ export const getQuiz = async (req: Request, res: Response) => {
               select: {
                 id: true,
                 text: true,
+                isCorrect: true,
               },
             },
           },
         },
       },
     });
+    console.log('Quiz found by Prisma:', quiz);
+
+    if (!quiz) {
+      return res.status(404).json({ error: 'Quiz not found' });
+    }
     res.json(quiz);
   } catch (error) {
+    console.error('Failed to fetch quiz', error);
     res.status(500).json({ error: 'Failed to fetch quiz' });
   }
 };
 
 export const submitQuiz = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const userId = req.user!.id; // Added non-null assertion operator
+  // Provide a fallback userId if req.user is not defined (e.g., for unauthenticated users)
+  const userId = req.user?.id || 1; // Use default user ID 1 if not authenticated
   const { answers } = req.body; // answers: { [questionId]: answerId }
 
   try {
@@ -86,9 +98,18 @@ export const submitQuiz = async (req: Request, res: Response) => {
 
     const percentage = (score / quiz.questions.length) * 100;
 
-    // Save the user's quiz attempt
-    await prisma.userQuiz.create({
-      data: {
+    // Save or update the user's quiz attempt
+    await prisma.userQuiz.upsert({
+      where: {
+        userId_quizId: {
+          userId,
+          quizId: parseInt(id),
+        },
+      },
+      update: {
+        score: percentage,
+      },
+      create: {
         userId,
         quizId: parseInt(id),
         score: percentage,
@@ -107,7 +128,8 @@ export const submitQuiz = async (req: Request, res: Response) => {
     }
 
     res.status(200).json({ score: percentage });
-  } catch (error) {
-    res.status(500).json({ error: 'Something went wrong' });
+  } catch (error: any) {
+    console.error('Error submitting quiz:', error);
+    res.status(500).json({ error: error.message || 'Something went wrong' });
   }
 };

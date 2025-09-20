@@ -16,7 +16,7 @@ async function seedQuizzes() {
               create: [
                 { text: 'Volcanic eruptions', isCorrect: false },
                 { text: 'Human activities', isCorrect: true },
-                { text: "Changes in the Earth's orbit", isCorrect: false },
+                { text: 'Changes in the Earth\'s orbit', isCorrect: false },
                 { text: 'Solar flares', isCorrect: false },
               ],
             },
@@ -37,6 +37,74 @@ async function seedQuizzes() {
     },
   });
   console.log(`Created quiz with id: ${quiz1.id}`);
+
+  const quiz2 = await prisma.quiz.create({
+    data: {
+      title: 'Renewable Energy',
+      description: 'How much do you know about renewable energy sources?',
+      questions: {
+        create: [
+          {
+            text: 'Which of these is a renewable energy source?',
+            answers: {
+              create: [
+                { text: 'Coal', isCorrect: false },
+                { text: 'Natural Gas', isCorrect: false },
+                { text: 'Solar Power', isCorrect: true },
+                { text: 'Petroleum', isCorrect: false },
+              ],
+            },
+          },
+          {
+            text: 'What is the main benefit of renewable energy?',
+            answers: {
+              create: [
+                { text: 'It is cheaper to produce', isCorrect: false },
+                { text: 'It produces less greenhouse gas emissions', isCorrect: true },
+                { text: 'It is easier to transport', isCorrect: false },
+                { text: 'It is available everywhere', isCorrect: false },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  });
+  console.log(`Created quiz with id: ${quiz2.id}`);
+
+  const quiz3 = await prisma.quiz.create({
+    data: {
+      title: 'Waste Management',
+      description: 'Test your knowledge on reducing waste and recycling.',
+      questions: {
+        create: [
+          {
+            text: 'Which of the following is part of the "3 Rs" of waste management?',
+            answers: {
+              create: [
+                { text: 'Recreate', isCorrect: false },
+                { text: 'Reduce', isCorrect: true },
+                { text: 'Rebuild', isCorrect: false },
+                { text: 'Replant', isCorrect: false },
+              ],
+            },
+          },
+          {
+            text: 'What is composting?',
+            answers: {
+              create: [
+                { text: 'Burning organic waste', isCorrect: false },
+                { text: 'Burying plastic waste', isCorrect: false },
+                { text: 'Recycling glass bottles', isCorrect: false },
+                { text: 'Decomposing organic matter to create fertilizer', isCorrect: true },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  });
+  console.log(`Created quiz with id: ${quiz3.id}`);
 }
 
 async function main() {
@@ -71,6 +139,8 @@ async function main() {
   await prisma.userEcoTip.deleteMany({});
   await prisma.userBadge.deleteMany({});
   await prisma.userQuiz.deleteMany({});
+  await prisma.answer.deleteMany({}); // New
+  await prisma.question.deleteMany({}); // New
   await prisma.ecoTip.deleteMany({});
   await prisma.badge.deleteMany({});
   await prisma.quiz.deleteMany({});
