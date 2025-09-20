@@ -25,8 +25,8 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
       return res.status(401).json({ message: 'User not found' });
     }
 
-    (req as any).user = { id: user.id }; // ✅ TS is happy
-    console.log('Auth Middleware: User attached to request:', (req as any).user);
+    req.user = { id: user.id };
+    console.log('Auth Middleware: User attached to request:', req.user);
 
     next();
   } catch (error) {

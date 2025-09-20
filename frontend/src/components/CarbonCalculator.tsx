@@ -1,17 +1,21 @@
 import { useState } from "react";
-import { Calculator, Car, Home, Utensils, TrendingDown } from "lucide-react";
+import { Calculator, Car, Home, Utensils, TrendingDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
+import api from "@/services/api";
+import { toast } from "sonner";
 
 const CarbonCalculator = () => {
   const [transport, setTransport] = useState([5]);
   const [energy, setEnergy] = useState([3]);
   const [food, setFood] = useState([4]);
-  
+  const [tips, setTips] = useState([]);
+  const [showTips, setShowTips] = useState(false);
+
   // Simple calculation for demo purposes
   const totalFootprint = (transport[0] + energy[0] + food[0]) * 0.5;
-  
+
   const getFootprintLevel = (footprint: number) => {
     if (footprint < 4) return { level: "Great!", color: "text-primary", message: "You're doing amazing for the planet! 🌱" };
     if (footprint < 7) return { level: "Good", color: "text-accent", message: "Nice work! A few changes could help even more! 🌿" };
@@ -19,6 +23,26 @@ const CarbonCalculator = () => {
   };
 
   const footprintInfo = getFootprintLevel(totalFootprint);
+
+  const getTips = async () => {
+    let category = 'General';
+    if (transport[0] > energy[0] && transport[0] > food[0]) {
+      category = 'Transport';
+    } else if (energy[0] > transport[0] && energy[0] > food[0]) {
+      category = 'Energy';
+    } else if (food[0] > transport[0] && food[0] > energy[0]) {
+      category = 'Food';
+    }
+
+    try {
+      const response = await api.get(`/tips?category=${category}`);
+      setTips(response.data);
+      setShowTips(true);
+    } catch (error) {
+      console.error('Failed to fetch tips', error);
+      toast.error('Failed to fetch tips');
+    }
+  };
 
   return (
     <Card className="p-6 shadow-soft border-secondary/10">
@@ -106,10 +130,27 @@ const CarbonCalculator = () => {
             <p className="text-sm text-muted-foreground mt-1">{footprintInfo.message}</p>
           </div>
           
-          <Button variant="nature" className="w-full mt-4" size="sm">
+          <Button variant="nature" className="w-full mt-4" size="sm" onClick={getTips}>
             Get Tips to Improve
           </Button>
         </div>
+
+        {/* Tips Section */}
+        {showTips && (
+          <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-lg font-bold">Improvement Tips</h4>
+              <Button variant="ghost" size="icon" onClick={() => setShowTips(false)}>
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+            <ul className="space-y-2">
+              {tips.map((tip) => (
+                <li key={tip.id} className="text-sm text-muted-foreground">{tip.tip}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </Card>
   );

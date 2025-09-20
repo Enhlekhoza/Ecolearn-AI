@@ -12,8 +12,12 @@ model User {
   email           String           @unique
   name            String?
   password        String
+  points          Int              @default(0)
   carbonFootprint CarbonFootprint?
   chatSessions    ChatSession[]
+  badges          UserBadge[]
+  completedTips   UserEcoTip[]
+  quizzes         UserQuiz[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 }
@@ -50,8 +54,77 @@ model ChatHistory {
 }
 
 model EcoTip {
-  id        Int      @id @default(autoincrement())
-  tip       String
-  category  String
+  id            Int          @id @default(autoincrement())
+  tip           String
+  category      String
+  completedBy   UserEcoTip[]
+  createdAt     DateTime     @default(now())
+}
+
+model Badge {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  description String
+  icon        String
+  points      Int
+  users       UserBadge[]
+  createdAt   DateTime    @default(now())
+}
+
+model UserBadge {
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  badgeId   Int
   createdAt DateTime @default(now())
+
+  @@id([userId, badgeId])
+}
+
+model UserEcoTip {
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  ecoTip    EcoTip   @relation(fields: [ecoTipId], references: [id])
+  ecoTipId  Int
+  createdAt DateTime @default(now())
+
+  @@id([userId, ecoTipId])
+}
+
+model Quiz {
+  id          Int        @id @default(autoincrement())
+  title       String
+  description String
+  questions   Question[]
+  completedBy UserQuiz[]
+  createdAt   DateTime   @default(now())
+}
+
+model Question {
+  id        Int      @id @default(autoincrement())
+  text      String
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  quizId    Int
+  answers   Answer[]
+  createdAt DateTime @default(now())
+}
+
+model Answer {
+  id         Int      @id @default(autoincrement())
+  text       String
+  isCorrect  Boolean
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId Int
+  createdAt  DateTime @default(now())
+}
+
+model UserQuiz {
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  quizId    Int
+  score     Int
+  createdAt DateTime @default(now())
+
+  @@id([userId, quizId])
 }

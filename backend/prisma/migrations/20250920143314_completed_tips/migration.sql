@@ -1,0 +1,10 @@
+-- CreateTable
+CREATE TABLE "UserEcoTip" (
+    "userId" INTEGER NOT NULL,
+    "ecoTipId" INTEGER NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY ("userId", "ecoTipId"),
+    CONSTRAINT "UserEcoTip_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "UserEcoTip_ecoTipId_fkey" FOREIGN KEY ("ecoTipId") REFERENCES "EcoTip" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);

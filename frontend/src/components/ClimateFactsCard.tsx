@@ -1,42 +1,48 @@
-import { useState } from "react";
-import { Lightbulb, ArrowRight, Leaf, Droplets, Sun } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Lightbulb, ArrowRight, Leaf, Droplets, Sun, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import climateActions from "@/assets/climate-actions.png";
+import api from "@/services/api";
+import { toast } from "sonner";
 
 const ClimateFactsCard = () => {
-  const facts = [
-    {
-      icon: Leaf,
-      title: "Trees are Climate Heroes!",
-      fact: "One tree can absorb 48 pounds of CO2 per year and produce enough oxygen for 2 people!",
-      tip: "Plant a tree or help take care of plants in your community!",
-      color: "text-primary"
-    },
-    {
-      icon: Droplets,
-      title: "Water is Precious",
-      fact: "Turning off the tap while brushing teeth can save up to 8 gallons of water per day!",
-      tip: "Take shorter showers and fix leaky faucets to help conserve water!",
-      color: "text-secondary"
-    },
-    {
-      icon: Sun,
-      title: "Solar Power is Amazing!",
-      fact: "The sun gives us more energy in one hour than humans use in an entire year!",
-      tip: "Look for solar panels in your neighborhood and learn how they work!",
-      color: "text-accent"
-    }
-  ];
+  const [tips, setTips] = useState([]);
+  const [currentTip, setCurrentTip] = useState(0);
 
-  const [currentFact, setCurrentFact] = useState(0);
+  useEffect(() => {
+    const fetchTips = async () => {
+      try {
+        const response = await api.get('/tips');
+        setTips(response.data);
+      } catch (error) {
+        console.error('Failed to fetch tips', error);
+      }
+    };
 
-  const nextFact = () => {
-    setCurrentFact((prev) => (prev + 1) % facts.length);
+    fetchTips();
+  }, []);
+
+  const nextTip = () => {
+    setCurrentTip((prev) => (prev + 1) % tips.length);
   };
 
-  const fact = facts[currentFact];
-  const IconComponent = fact.icon;
+  const completeTip = async (tipId: number) => {
+    try {
+      await api.post(`/tips/${tipId}/complete`);
+      toast.success("You earned 10 points!");
+    } catch (error) {
+      console.error('Failed to complete tip', error);
+      toast.error('Failed to complete tip');
+    }
+  };
+
+  if (tips.length === 0) {
+    return null;
+  }
+
+  const tip = tips[currentTip];
+  const IconComponent = tip.category === 'Water' ? Droplets : tip.category === 'Energy' ? Sun : Leaf;
 
   return (
     <Card className="p-6 shadow-soft border-accent/10 bg-gradient-to-br from-card to-muted/20">
@@ -50,9 +56,9 @@ const ClimateFactsCard = () => {
 
       {/* Image */}
       <div className="mb-4 rounded-lg overflow-hidden">
-        <img 
-          src={climateActions} 
-          alt="Climate friendly actions" 
+        <img
+          src={climateActions}
+          alt="Climate friendly actions"
           className="w-full h-24 object-cover"
         />
       </div>
@@ -60,33 +66,29 @@ const ClimateFactsCard = () => {
       {/* Current Fact */}
       <div className="space-y-4">
         <div className="flex items-start gap-3">
-          <IconComponent className={`w-6 h-6 ${fact.color} flex-shrink-0 mt-1`} />
+          <IconComponent className={`w-6 h-6 text-primary flex-shrink-0 mt-1`} />
           <div>
-            <h4 className="font-semibold text-foreground mb-2">{fact.title}</h4>
-            <p className="text-sm text-muted-foreground mb-3">{fact.fact}</p>
+            <h4 className="font-semibold text-foreground mb-2">{tip.category}</h4>
             <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-primary">
               <p className="text-sm font-medium text-primary">💡 Your Action:</p>
-              <p className="text-xs text-foreground mt-1">{fact.tip}</p>
+              <p className="text-xs text-foreground mt-1">{tip.tip}</p>
             </div>
           </div>
         </div>
 
         {/* Navigation */}
         <div className="flex items-center justify-between pt-4 border-t border-border/50">
-          <div className="flex gap-1">
-            {facts.map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  index === currentFact ? "bg-primary" : "bg-muted"
-                }`}
-              />
-            ))}
-          </div>
-          
-          <Button 
-            onClick={nextFact} 
-            variant="sunshine" 
+          <Button
+            onClick={() => completeTip(tip.id)}
+            variant="outline"
+            size="sm"
+          >
+            <CheckCircle className="w-4 h-4 mr-2" />
+            Mark as Done
+          </Button>
+          <Button
+            onClick={nextTip}
+            variant="sunshine"
             size="sm"
             className="animate-glow"
           >
