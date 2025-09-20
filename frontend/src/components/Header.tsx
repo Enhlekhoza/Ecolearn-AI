@@ -1,6 +1,7 @@
 import { Leaf, Sparkles, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import earthMascot from "@/assets/earth-mascot.png";
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   return (
@@ -20,7 +21,7 @@ const Header = () => {
               </div>
             </div>
             <div>
-              <h1 className="text-2xl font-bold gradient-primary bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold text-white bg-green-500">
                 EcoLearn AI
               </h1>
               <p className="text-xs text-muted-foreground">Climate Education for Young Minds</p>
@@ -29,17 +30,21 @@ const Header = () => {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center gap-6">
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              <Leaf className="w-4 h-4 mr-2" />
-              Learn
-            </Button>
+            <Link to="/learn">
+              <Button variant="ghost" className="text-foreground hover:text-primary">
+                <Leaf className="w-4 h-4 mr-2" />
+                Learn
+              </Button>
+            </Link>
             <Button variant="ghost" className="text-foreground hover:text-primary">
               <Sparkles className="w-4 h-4 mr-2" />
               AI Chat
             </Button>
-            <Button variant="nature" size="sm">
-              Get Started
-            </Button>
+            <Link to="/login">
+              <Button variant="nature" size="sm">
+                Login
+              </Button>
+            </Link>
           </nav>
 
           {/* Mobile Menu */}
