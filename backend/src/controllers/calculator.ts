@@ -2,9 +2,11 @@ import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 
 export const calculate = async (req: Request, res: Response) => {
-  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+  const user = (req as any).user; // ✅ cast once
 
-  const userId = Number(req.user.id); // Convert to number
+  if (!user) return res.status(401).json({ message: 'Unauthorized' });
+
+  const userId = Number(user.id); // Convert to number
   const { transport, energy, diet } = req.body;
   const total = transport + energy + diet;
 
@@ -23,9 +25,11 @@ export const calculate = async (req: Request, res: Response) => {
 };
 
 export const getFootprint = async (req: Request, res: Response) => {
-  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+  const user = (req as any).user; // ✅ cast once
 
-  const userId = Number(req.user.id);
+  if (!user) return res.status(401).json({ message: 'Unauthorized' });
+
+  const userId = Number(user.id);
 
   try {
     const carbonFootprint = await prisma.carbonFootprint.findUnique({

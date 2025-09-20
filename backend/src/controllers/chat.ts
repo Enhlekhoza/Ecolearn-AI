@@ -3,9 +3,11 @@ import prisma from '../lib/prisma';
 import { callAI } from '../services/ai';
 
 export const getSessions = async (req: Request, res: Response) => {
-  if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+  const user = (req as any).user; // ✅ cast once
 
-  const userId = Number(req.user.id);
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+
+  const userId = Number(user.id);
 
   try {
     const sessions = await prisma.chatSession.findMany({
@@ -23,9 +25,11 @@ export const getSessions = async (req: Request, res: Response) => {
 };
 
 export const sendMessage = async (req: Request, res: Response) => {
-  if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+  const user = (req as any).user; // ✅ cast once
 
-  const userId = Number(req.user.id);
+  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+
+  const userId = Number(user.id);
   const { message, sessionId } = req.body;
 
   try {

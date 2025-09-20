@@ -1,11 +1,15 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prisma';
 
+// Helper to safely get user from req
+const getUserFromReq = (req: Request) => (req as any).user;
+
 export const getProfile = async (req: Request, res: Response) => {
-  if (!req.user) return res.status(401).json({ message: 'Not authorized' });
+  const user = getUserFromReq(req);
+  if (!user) return res.status(401).json({ message: 'Not authorized' });
 
-  const user = await prisma.user.findUnique({ where: { id: Number(req.user.id) } });
-  if (!user) return res.status(404).json({ message: 'User not found' });
+  const dbUser = await prisma.user.findUnique({ where: { id: Number(user.id) } });
+  if (!dbUser) return res.status(404).json({ message: 'User not found' });
 
-  res.json({ id: user.id, email: user.email, name: user.name });
+  res.json({ id: dbUser.id, email: dbUser.email, name: dbUser.name });
 };
