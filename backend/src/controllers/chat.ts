@@ -3,11 +3,11 @@ import prisma from '../lib/prisma';
 import { callAI } from '../services/ai';
 
 export const getSessions = async (req: Request, res: Response) => {
-  const user = (req as any).user; // ✅ cast once
+  // const user = (req as any).user; // Removed for hackathon
 
-  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+  // if (!user) return res.status(401).json({ error: 'Unauthorized' }); // Removed for hackathon
 
-  const userId = Number(user.id);
+  const userId = 1; // Hardcoded for hackathon
 
   try {
     const sessions = await prisma.chatSession.findMany({
@@ -25,11 +25,11 @@ export const getSessions = async (req: Request, res: Response) => {
 };
 
 export const sendMessage = async (req: Request, res: Response) => {
-  const user = (req as any).user; // ✅ cast once
+  // const user = (req as any).user; // Removed for hackathon
 
-  if (!user) return res.status(401).json({ error: 'Unauthorized' });
+  // if (!user) return res.status(401).json({ error: 'Unauthorized' }); // Removed for hackathon
 
-  const userId = Number(user.id);
+  const userId = 1; // Hardcoded for hackathon
   const { message, sessionId } = req.body;
 
   try {
