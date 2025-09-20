@@ -1,6 +1,6 @@
 
 import axios from 'axios';
-// import { getEnv } from '../utils/env'; // Assuming getEnv can read environment variables
+import { getEnv } from '../utils/env'; // Assuming getEnv can read environment variables
 
 const promptTemplates = {
   ecoLearner: (
@@ -10,8 +10,7 @@ const promptTemplates = {
 
 const getAIResponse = async (message: string): Promise<string> => {
   const prompt = promptTemplates.ecoLearner(message);
-  // const geminiApiKey = getEnv('GEMINI_API_KEY'); // Use this in a real application
-  const geminiApiKey = 'AIzaSyAANAaZsKu7K8F2JA0NifZzSkDcqIZTpE8'; // HARDCODED FOR HACKATHON - REMOVE LATER!
+  const geminiApiKey = getEnv('GEMINI_API_KEY'); // Use this in a real application
 
   if (!geminiApiKey) {
     console.error('GEMINI_API_KEY is not set in environment variables.');
